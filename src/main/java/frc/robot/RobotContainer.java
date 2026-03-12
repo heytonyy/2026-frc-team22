@@ -18,7 +18,11 @@ import edu.wpi.first.wpilibj.PS4Controller.Button;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.ShooterConstants;
+import frc.robot.subsystems.ClimbSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.IndexerSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -35,9 +39,14 @@ import java.util.List;
 public class RobotContainer {
   // The robot's subsystems
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final ClimbSubsystem m_climb = new ClimbSubsystem();
+  private final ShooterSubsystem m_shooter = new ShooterSubsystem();
+  private final IndexerSubsystem m_indexer = new IndexerSubsystem();
 
   // The driver's controller
   XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  // The operator's controller
+  XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -45,6 +54,20 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+
+    // Stop climb motors when no button is held
+    m_climb.setDefaultCommand(new RunCommand(() -> m_climb.stop(), m_climb));
+
+    // Shooter runs at idle by default; operator left stick Y adjusts speed up or down
+    m_shooter.setDefaultCommand(new RunCommand(() -> {
+      double input = -MathUtil.applyDeadband(m_operatorController.getLeftY(), OIConstants.kDriveDeadband);
+      double speed = MathUtil.clamp(
+          ShooterConstants.kIdleSpeed + input * ShooterConstants.kSpeedAdjustRange, 0.0, 1.0);
+      m_shooter.setSpeed(speed);
+    }, m_shooter));
+
+    // Stop indexer when no button is held
+    m_indexer.setDefaultCommand(new RunCommand(() -> m_indexer.stop(), m_indexer));
 
     // Configure default commands
     m_robotDrive.setDefaultCommand(
@@ -78,6 +101,17 @@ public class RobotContainer {
         .onTrue(new InstantCommand(
             () -> m_robotDrive.zeroHeading(),
             m_robotDrive));
+
+    // Climb controls: hold Y to lift, hold A to lower; releasing either stops the motors
+    new JoystickButton(m_driverController, XboxController.Button.kY.value)
+        .whileTrue(new RunCommand(() -> m_climb.lift(), m_climb));
+
+    new JoystickButton(m_driverController, XboxController.Button.kA.value)
+        .whileTrue(new RunCommand(() -> m_climb.lower(), m_climb));
+
+    // Indexer: hold Right Bumper to release the ball into the shooter
+    new JoystickButton(m_operatorController, XboxController.Button.kRightBumper.value)
+        .whileTrue(new RunCommand(() -> m_indexer.release(), m_indexer));
   }
 
   /**

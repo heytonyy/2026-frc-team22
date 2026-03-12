@@ -5,7 +5,10 @@ import com.revrobotics.spark.FeedbackSensor;
 import com.revrobotics.spark.config.AbsoluteEncoderConfig;
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
+import frc.robot.Constants.ClimbConstants;
+import frc.robot.Constants.IndexerConstants;
 import frc.robot.Constants.ModuleConstants;
+import frc.robot.Constants.ShooterConstants;
 
 public final class Configs {
     public static final class MAXSwerveModule {
@@ -57,6 +60,46 @@ public final class Configs {
                     // longer route.
                     .positionWrappingEnabled(true)
                     .positionWrappingInputRange(0, turningFactor);
+        }
+    }
+
+    public static final class Shooter {
+        public static final SparkMaxConfig motorConfig = new SparkMaxConfig();
+
+        static {
+            motorConfig
+                    // kCoast lets the flywheel spin down naturally rather than fighting inertia
+                    .idleMode(IdleMode.kCoast)
+                    .smartCurrentLimit(ShooterConstants.kSmartCurrentLimit);
+        }
+    }
+
+    public static final class Indexer {
+        public static final SparkMaxConfig motorConfig = new SparkMaxConfig();
+
+        static {
+            motorConfig
+                    // kBrake stops the indexer immediately when the button is released
+                    .idleMode(IdleMode.kBrake)
+                    .smartCurrentLimit(IndexerConstants.kSmartCurrentLimit);
+        }
+    }
+
+    public static final class Climb {
+        public static final SparkMaxConfig leaderConfig = new SparkMaxConfig();
+        public static final SparkMaxConfig followerConfig = new SparkMaxConfig();
+
+        static {
+            leaderConfig
+                    .idleMode(IdleMode.kBrake)
+                    .smartCurrentLimit(ClimbConstants.kSmartCurrentLimit);
+
+            followerConfig
+                    .idleMode(IdleMode.kBrake)
+                    .smartCurrentLimit(ClimbConstants.kSmartCurrentLimit)
+                    // Follow the leader motor and invert direction.
+                    // If both motors spin the same way mechanically, set invert to false.
+                    .follow(ClimbConstants.kClimbLeaderCanId, true);
         }
     }
 }

@@ -56,6 +56,7 @@ public final class Constants {
     public static final int kFrontRightTurningCanId = 14;
     public static final int kRearRightTurningCanId = 16;
 
+
     public static final boolean kGyroReversed = false;
   }
 
@@ -74,10 +75,48 @@ public final class Constants {
     public static final double kDrivingMotorReduction = (45.0 * 22) / (kDrivingMotorPinionTeeth * 15);
     public static final double kDriveWheelFreeSpeedRps = (kDrivingMotorFreeSpeedRps * kWheelCircumferenceMeters)
         / kDrivingMotorReduction;
+
+  }
+
+  public static final class ShooterConstants {
+    // CAN ID for the shooter motor — update to match your robot's wiring
+    public static final int kShooterCanId = 30;
+
+    // Speed when no joystick input is applied (shooter should always be spinning)
+    public static final double kIdleSpeed = 0.5;
+
+    // How much the joystick can adjust speed above/below idle (0.0 to 1.0)
+    // Full forward = kIdleSpeed + kSpeedAdjustRange, full back = kIdleSpeed - kSpeedAdjustRange
+    public static final double kSpeedAdjustRange = 0.5;
+
+    public static final int kSmartCurrentLimit = 60;
+  }
+
+  public static final class IndexerConstants {
+    // CAN ID for the indexer motor — update to match your robot's wiring
+    public static final int kIndexerCanId = 31;
+
+    // Speed at which the indexer releases the ball into the shooter
+    public static final double kIndexerSpeed = 0.8;
+
+    public static final int kSmartCurrentLimit = 30;
+  }
+
+  public static final class ClimbConstants {
+    // CAN IDs for the two climb motors — update these to match your robot's wiring
+    public static final int kClimbLeaderCanId = 20;
+    public static final int kClimbFollowerCanId = 21;
+
+    // Max output power for lifting/lowering (0.0 to 1.0). Tune on the robot.
+    public static final double kClimbSpeed = 0.5;
+
+    // Current limit in amps to protect the motors and breakers
+    public static final int kSmartCurrentLimit = 40;
   }
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int kOperatorControllerPort = 1;
     public static final double kDriveDeadband = 0.05;
   }
 
