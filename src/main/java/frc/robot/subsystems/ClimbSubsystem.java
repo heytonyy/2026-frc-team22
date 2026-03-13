@@ -18,20 +18,16 @@ import frc.robot.Constants.ClimbConstants;
 
 public class ClimbSubsystem extends SubsystemBase {
   private final SparkMax m_climbLeader;
-  private final SparkMax m_climbFollower;
 
   private final RelativeEncoder m_encoder;
 
   public ClimbSubsystem() {
     m_climbLeader = new SparkMax(ClimbConstants.kClimbLeaderCanId, MotorType.kBrushless);
-    m_climbFollower = new SparkMax(ClimbConstants.kClimbFollowerCanId, MotorType.kBrushless);
 
     // Apply configurations — reset to a known state, then persist to survive power cycles.
     m_climbLeader.configure(Configs.Climb.leaderConfig,
         ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-    m_climbFollower.configure(Configs.Climb.followerConfig,
-        ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-
+        
     m_encoder = m_climbLeader.getEncoder();
     m_encoder.setPosition(0);
   }
